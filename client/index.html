@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Github searcher</h1>
+    <button id="btnRepos">Repos</button>
+    <div id="divResult">
+
+    </div>
+
+    <script>
+
+        const btnRepos = document.getElementById("btnRepos")
+        const divResult = document.getElementById("divResult")
+
+        btnRepos.addEventListener("click", getRepos)
+
+        let gitHubBaseUrl = "https://api.github.com"
+
+        async function getRepos() {
+
+            clear()
+
+            const response = await fetch(gitHubBaseUrl + "/search/repositories?q=stars:150000..300000")
+
+            const result = await response.json()
+
+            result.items.forEach(i => {
+                const anchor = document.createElement("a")
+
+                anchor.href = i.html_url
+
+                anchor.textContent = i.full_name
+
+                divResult.appendChild(anchor)
+                divResult.appendChild(document.createElement("br"))
+            })
+        }
+
+        function clear() {
+            while (divResult.firstChild) {
+                divResult.removeChild(divResult.firstChild)
+            }
+        }
+
+    </script>
+</body>
+
+</html>
