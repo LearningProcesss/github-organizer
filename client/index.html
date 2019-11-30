@@ -11,16 +11,17 @@
 <body>
     <h1>Github searcher</h1>
     <button id="btnRepos">Repos</button>
+    <button id="btnIssues">Issues</button>
     <div id="divResult">
-
     </div>
-
     <script>
 
         const btnRepos = document.getElementById("btnRepos")
+        const btnIssues = document.getElementById("btnIssues")
         const divResult = document.getElementById("divResult")
 
         btnRepos.addEventListener("click", getRepos)
+        btnIssues.addEventListener("click", getIssues)
 
         let gitHubBaseUrl = "https://api.github.com"
 
@@ -38,6 +39,26 @@
                 anchor.href = i.html_url
 
                 anchor.textContent = i.full_name
+
+                divResult.appendChild(anchor)
+                divResult.appendChild(document.createElement("br"))
+            })
+        }
+
+        async function getIssues() {
+
+            clear()
+
+            const response = await fetch(gitHubBaseUrl + "/search/issues?q=repo:freecodecamp/freecodecamp type:issue")
+
+            const result = await response.json()
+
+            result.items.forEach(i => {
+                const anchor = document.createElement("a")
+
+                anchor.href = i.html_url
+
+                anchor.textContent = i.title
 
                 divResult.appendChild(anchor)
                 divResult.appendChild(document.createElement("br"))
