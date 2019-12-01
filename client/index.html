@@ -12,16 +12,19 @@
     <h1>Github searcher</h1>
     <button id="btnRepos">Repos</button>
     <button id="btnIssues">Issues</button>
+    <button id="btnCommits">Commits</button>
     <div id="divResult">
     </div>
     <script>
 
         const btnRepos = document.getElementById("btnRepos")
         const btnIssues = document.getElementById("btnIssues")
+        const btnCommits = document.getElementById("btnCommits")
         const divResult = document.getElementById("divResult")
 
         btnRepos.addEventListener("click", getRepos)
         btnIssues.addEventListener("click", getIssues)
+        btnCommits.addEventListener("click", getCommits)
 
         let gitHubBaseUrl = "https://api.github.com"
 
@@ -59,6 +62,32 @@
                 anchor.href = i.html_url
 
                 anchor.textContent = i.title
+
+                divResult.appendChild(anchor)
+                divResult.appendChild(document.createElement("br"))
+            })
+        }
+
+        async function getCommits() {
+
+            clear()
+
+            const options = {
+                headers: {
+                    'Accept': 'application/vnd.github.cloak-preview'
+                }
+            }
+
+            const response = await fetch(gitHubBaseUrl + "/search/commits?q=repo:octocat/Spoon-Knife+css", options)
+
+            const result = await response.json()
+
+            result.items.forEach(i => {
+                const anchor = document.createElement("a")
+
+                anchor.href = i.html_url
+
+                anchor.textContent = i.commit.message
 
                 divResult.appendChild(anchor)
                 divResult.appendChild(document.createElement("br"))
