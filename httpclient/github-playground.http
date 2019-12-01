@@ -1,1 +1,7 @@
-GET https://api.github.com//search/commits?q=repo:octocat/Spoon-Knife+css HTTP/1.1
+GET https://api.github.com/search/commits?q=repo:octocat/Spoon-Knife+css HTTP/1.1
+Accept: application/vnd.github.cloak-preview
+#####
+GET https://api.github.com/search/repositories?q=stars:150000..300000  HTTP/1.1
+#####
+GET https://api.github.com/users/learningprocesss/subscriptions  HTTP/1.1
+

@@ -10,23 +10,141 @@
 
 <body>
     <h1>Github searcher</h1>
+    <label for="usr">Usr</label>
+    <input type="text" id="usr" name="usr">
+    <label for="pw">Pw</label>
+    <input type="password" id="pw" name="pw">
+    <button id="btnAuth">Auth</button>
     <button id="btnRepos">Repos</button>
     <button id="btnIssues">Issues</button>
     <button id="btnCommits">Commits</button>
-    <div id="divResult">
-    </div>
+    <button id="btnWatching">Watching</button>
+    <div id="divResult"></div>
+    <div id="divPagination"></div>
     <script>
 
         const btnRepos = document.getElementById("btnRepos")
         const btnIssues = document.getElementById("btnIssues")
         const btnCommits = document.getElementById("btnCommits")
+        const btnAuth = document.getElementById("btnAuth")
+        const btnWatching = document.getElementById("btnWatching")
         const divResult = document.getElementById("divResult")
+        const divPagination = document.getElementById("divPagination")
 
         btnRepos.addEventListener("click", getRepos)
         btnIssues.addEventListener("click", getIssues)
         btnCommits.addEventListener("click", getCommits)
+        btnAuth.addEventListener("click", auth)
+        btnWatching.addEventListener("click", getWatching)
 
+        let paginationCreated = false
         let gitHubBaseUrl = "https://api.github.com"
+
+        async function auth() {
+
+            const usr = document.getElementById("usr").value
+            const pw = document.getElementById("pw").value
+
+            const options = {
+                headers: {
+                    'Authorization': `Basic ${btoa(`${usr}:${pw}`)}`
+                }
+            }
+
+            const response = await fetch(gitHubBaseUrl, options)
+
+            const result = await response.json()
+
+            getWatching()
+        }
+
+        async function authToken() {
+            //6d6d4a17453caab7dbad37110df23acd2f3d8853
+
+        }
+
+        function preparePaginationFromApi(links) {
+            if (links === undefined || links === null) { return }
+
+            const paginationData = links.split(',')
+                .map(link => { return link.split(';')[0] })
+                .map(link => { return link.replace('<', '').replace('>', '') })
+                .map(link => {
+                    return {
+                        link: link,
+                        number: link.split('=')[1]
+                    }
+                })
+
+            iteratePagination(paginationData)
+        }
+
+        function iteratePagination(paginationData) {
+            if (paginationData === null || paginationData === undefined) { return }
+
+            const max = paginationData.reduce(function (prev, current) {
+                return (prev.number < current.number) ? prev : current
+            })
+
+            const min = paginationData.reduce(function (prev, current) {
+                return (prev.number > current.number) ? prev : current
+            })
+
+            const toCreate = max.number - min.number
+
+            let newLink = max.link.split('=')[0]
+
+            for (let index = 1; index <= toCreate; index++) {
+
+                paginationData.push({
+                    link: newLink + '=' + (parseInt(min.number) + parseInt(index)),
+                    number: (parseInt(min.number) + parseInt(index))
+                })
+            }
+
+            paginationData
+                .sort((a, b) => parseInt(a.number) - parseInt(b.number))
+                .forEach(data => createPaginationLink(data.link, data.number))
+
+            paginationCreated = true
+        }
+
+        function createPaginationLink(link, number) {
+            const a = document.createElement('a')
+            a.href = link
+            a.textContent = number
+            a.addEventListener("click", getWatching)
+            divPagination.appendChild(a)
+        }
+
+        async function getWatching(event) {
+            clear()
+
+            let link = gitHubBaseUrl + "/users/learningprocesss/subscriptions"
+
+            if (event.currentTarget.href) {
+                event.preventDefault()
+                link = event.currentTarget.href
+            }
+
+            const response = await fetch(link)
+
+            const result = await response.json()
+
+            result.forEach(i => {
+                const anchor = document.createElement("a")
+
+                anchor.href = i.html_url
+
+                anchor.textContent = i.full_name
+
+                divResult.appendChild(anchor)
+                divResult.appendChild(document.createElement("br"))
+            })
+
+            if (!paginationCreated)
+                preparePaginationFromApi(await response.headers.get("link"))
+        }
 
         async function getRepos() {
 
@@ -79,6 +197,7 @@
             }
 
             const response = await fetch(gitHubBaseUrl + "/search/commits?q=repo:octocat/Spoon-Knife+css", options)
+            console.log(response.headers.get("link"));
 
             const result = await response.json()
 
