@@ -1,0 +1,19 @@
+.app-header {
+    color: darkslategray;
+    background-color: crimson;
+}
+
+.app-header-title {
+    text-align: center;
+    margin: 0%;
+}
+
+.app-header-logo-right {
+    float: right;
+    width: 4%;
+}
+
+.app-header-logo-left {
+    float: left;
+    width: 4%;
+}
