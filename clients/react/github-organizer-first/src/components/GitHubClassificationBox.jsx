@@ -9,9 +9,13 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import { Typography, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, IconButton, Badge, ButtonBase, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
 import GiHubSubscriptions from './GiHubSubscriptions';
 
-function GitHubClassificationBox({ classificationDto, handlerClassificationSelected }) {
+function GitHubClassificationBox({ classificationDto, gitHubDto, handlerPaginationChanged, handlerClassificationSelected }) {
 
+    console.log(gitHubDto);
+    
     const [open, setOpen] = React.useState(false);
+
+    const [subscriptionsToAdd, setSubscriptionsToAdd] = React.useState([])
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -25,17 +29,23 @@ function GitHubClassificationBox({ classificationDto, handlerClassificationSelec
         return classificationDto.githubLinks.length > 0 ? "primary" : "secondary"
     }
 
+    const onPaginationChanged = async (value) => {
+        console.log('onPaginationChanged GitHubClassificationBox', value);
+        handlerPaginationChanged(value)
+    }
+
+    const onGitHubItemSelected = (value) => {
+        console.log('onGitHubItemSelected GitHubClassificationBox', value);
+
+        setSubscriptionsToAdd(previousStateArray => [...previousStateArray, value])
+    }
+
+    const onDialogSaveButtonClicked = (value) => {
+
+    }
+
     return (
         <div>
-            {/* <Box style={{ marginLeft: 15, marginTop: 15 }} boxShadow={3}>
-                <Grid container>
-                    <Grid item>
-                        <Typography gutterBottom variant="subtitle1">
-                            Standard license
-                        </Typography>
-                    </Grid>
-                </Grid>
-            </Box> */}
             <Card elevation={2}>
                 {/* <ButtonBase>
                     
@@ -87,14 +97,20 @@ function GitHubClassificationBox({ classificationDto, handlerClassificationSelec
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Create new Classification</DialogTitle>
                 <DialogContent>
-                    <GiHubSubscriptions subscriptions={[]} />
+                    <GiHubSubscriptions 
+                        handlerGitHubSubSelected={onGitHubItemSelected}
+                        handlerPaginationChanged={onPaginationChanged}
+                        showCheckbox={true}
+                        showPagination="both"
+                        subscriptions={gitHubDto.gitHubSubscriptions} 
+                        pagesCount={gitHubDto.gitHubPages}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">
-                        Cancel
+                        Dismiss
                     </Button>
-                    <Button color="primary">
-                        Create
+                    <Button onClick={onDialogSaveButtonClicked} color="primary">
+                        Add
                     </Button>
                 </DialogActions>
             </Dialog>

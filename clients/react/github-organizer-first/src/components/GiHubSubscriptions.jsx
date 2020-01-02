@@ -6,7 +6,7 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser';
 
-function GiHubSubscriptions({ showCheckbox, showPagination, subscriptions, pagesCount, handlerPaginationChanged, subscriptionsHandler }) {
+function GiHubSubscriptions({ showCheckbox, showPagination, subscriptions, pagesCount, handlerPaginationChanged, handlerGitHubSubSelected }) {
 
     // const [pagesCount, setPagesCount] = useState(10)
 
@@ -34,12 +34,10 @@ function GiHubSubscriptions({ showCheckbox, showPagination, subscriptions, pages
     const [checked, setChecked] = React.useState(['']);
 
     const onListItemClicked = value => () => {
-        console.log('onListItemClicked', value);
-
+    
         const currentIndex = checked.indexOf(value);
-        console.log('[0]', currentIndex);
+    
         const newChecked = [...checked];
-        console.log('[1]', newChecked);
 
         if (currentIndex === -1) {
             newChecked.push(value);
@@ -47,11 +45,9 @@ function GiHubSubscriptions({ showCheckbox, showPagination, subscriptions, pages
             newChecked.splice(currentIndex, 1);
         }
 
-        console.log('[2]', newChecked);
-
         setChecked(newChecked);
 
-        subscriptionsHandler(value)
+        handlerGitHubSubSelected(subscriptions.filter(sub => sub.html_url === value)[0])
     }
 
     const onPaginationChanged = (value) => {

@@ -123,16 +123,12 @@ export default class GitHubClassificationAdmin extends Component {
     }
 
     onPaginationChanged = async (value) => {
-        console.log('onPaginationChanged', value);
+        console.log('onPaginationChanged GitHubClassificationAdmin', value);
         const response = await queryGitHub(`subscriptions?page=${value}`)
 
         this.setState({
             subscriptions: arrayDestructuring(await response.json(), '')
         })
-    }
-
-    onGetGithubSubscrition = async () => {
-        
     }
 
     createNewClassification(data) {
@@ -191,9 +187,16 @@ export default class GitHubClassificationAdmin extends Component {
                                     return (
                                         <Grid item key={classification._id}>
                                             <GitHubClassificationBox
+                                                handlerPaginationChanged={this.onPaginationChanged}
                                                 handlerClassificationSelected={this.onClassificationSelected}
-                                                handlerGetGithubSubscrition={this.}
-                                                classificationDto={classification} />
+                                                handlerGetGithubSubscrition={this.onGetGithubSubscrition}
+                                                classificationDto={classification}
+                                                gitHubDto={
+                                                    {
+                                                        gitHubSubscriptions: this.state.subscriptions,
+                                                        gitHubPages: this.state.pages
+                                                    }
+                                                } />
                                         </Grid>
                                     )
                                 })
