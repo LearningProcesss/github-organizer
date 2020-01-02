@@ -4,6 +4,7 @@ import GitHubCommands from './GitHubCommands';
 import GiHubSubscriptions from './GiHubSubscriptions';
 import { queryGitHub, getPagesFromLink, arrayDestructuring } from '../lib/utils';
 import { Grid } from '@material-ui/core';
+import GitHubClassificationBox from './GitHubClassificationBox';
 
 export default class GitHubClassificationAdmin extends Component {
 
@@ -73,15 +74,10 @@ export default class GitHubClassificationAdmin extends Component {
     }
 
     async setupGithub() {
+
         const response = await queryGitHub('subscriptions')
 
-        // const subscriptions = 
-
         const pages = await getPagesFromLink(response)
-
-
-        // console.log('destr', pickFromArray(subscriptions, 'name', 'full_name', 'html_url') , pages);
-
 
         this.setState({
             subscriptions: arrayDestructuring(await response.json(), ''),
@@ -117,13 +113,26 @@ export default class GitHubClassificationAdmin extends Component {
 
     onAddSubscriptions = async () => {
         const result = await this.updateStitch({
-            _id: { $eq: this.state.classificationSelected }
+            _id: { $eq: this.state.classificationSelected._id }
         }, {
             $push: {
                 githubLinks: { $each: this.state.subscriptionsSelectedToAdd }
             }
         })
         console.log('onAddSubscriptions', result);
+    }
+
+    onPaginationChanged = async (value) => {
+        console.log('onPaginationChanged', value);
+        const response = await queryGitHub(`subscriptions?page=${value}`)
+
+        this.setState({
+            subscriptions: arrayDestructuring(await response.json(), '')
+        })
+    }
+
+    onGetGithubSubscrition = async () => {
+        
     }
 
     createNewClassification(data) {
@@ -142,32 +151,57 @@ export default class GitHubClassificationAdmin extends Component {
     renderSubscriptions() {
         if (!this.state.subscriptions.length || this.state.pages === -1) { return null }
 
-        return <GiHubSubscriptions subscriptionsHandler={this.onSubscriptionsSelected} pagesCount={this.state.pages} subscriptions={this.state.subscriptions} />
+        return <GiHubSubscriptions
+            handlerPaginationChanged={this.onPaginationChanged}
+            showCheckbox={true}
+            showPagination='both'
+            subscriptionsHandler={this.onSubscriptionsSelected}
+            pagesCount={this.state.pages}
+            subscriptions={this.state.subscriptions} />
     }
 
     renderClassificationSubscriptions() {
-        if(!this.state.canRenderClassificationSubscriptions) {return null}
+        if (!this.state.canRenderClassificationSubscriptions) { return null }
 
-        return <GiHubSubscriptions subscriptionsHandler={this.onSubscriptionsSelected} pagesCount={this.state.pages} subscriptions={this.state.classificationSelected.githubLinks} />        
+        return <GiHubSubscriptions
+            handlerPaginationChanged={this.onPaginationChanged}
+            subscriptionsHandler={this.onSubscriptionsSelected}
+            showCheckbox={false}
+            pagesCount={this.state.pages}
+            subscriptions={this.state.classificationSelected.githubLinks} />
     }
 
     render() {
         return (
             <div>
-                <GitHubCommands
+                {/* <GitHubCommands
                     handlerClassificationSelected={this.onClassificationSelected}
                     handlerAddSubscription={this.onAddSubscriptions}
                     handlerClassificationCreate={this.onCreate}
                     classificationPanel={this.props.classificationPanel}
                     classifications={this.state.classifications}
-                    canAddSubscriptions={this.state.canAddSubscriptions} />
+                    canAddSubscriptions={this.state.canAddSubscriptions} /> */}
                 <Grid container>
-                    <Grid item lg={6} md={6} sm={6} xs={6}>
-                        {
-                            this.renderSubscriptions()
-                        }
+                    <Grid item lg={2} md={4} sm={4} xs={4}>
+
+                        {/* // this.renderSubscriptions() */}
+                        <Grid style={{ marginTop: 10 }} container direction="column" spacing={1}>
+                            {
+                                this.state.classifications.map(classification => {
+                                    return (
+                                        <Grid item key={classification._id}>
+                                            <GitHubClassificationBox
+                                                handlerClassificationSelected={this.onClassificationSelected}
+                                                handlerGetGithubSubscrition={this.}
+                                                classificationDto={classification} />
+                                        </Grid>
+                                    )
+                                })
+                            }
+                        </Grid>
+
                     </Grid>
-                    <Grid item lg={6} md={6} sm={6} xs={6}>
+                    <Grid style={{ marginTop: 7 }} item lg={6} md={6} sm={6} xs={6}>
                         {
                             this.renderClassificationSubscriptions()
                         }

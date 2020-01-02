@@ -56,14 +56,14 @@ export default function GitHubCommands(props) {
             {//style={{ marginTop: 15, marginLeft: 5, marginBottom: 10 }}
                 props.classificationPanel ?
                     <div>
-                        <Grid style={{ marginTop: 15 }} container spacing={2} justify="center" alignItems="center">
+                        <Grid style={{ marginTop: 15 }} container direction="column" justify="center" alignItems="center">
                             <Grid item>
                                 <Autocomplete
                                     id="combo-box-demo"
                                     options={props.classifications}
                                     getOptionLabel={classification => `${classification.name} (${classification.githubLinks.length})`}
                                     renderInput={params => (
-                                        <TextField {...params} size="small" label="Classifications" variant="outlined" fullWidth />
+                                        <TextField {...params} size="small" label="Classifications" margin="normal" variant="outlined" fullWidth />
                                     )}
                                     onChange={onClassificationSelectItemChanged}
                                 />
@@ -71,6 +71,7 @@ export default function GitHubCommands(props) {
                             <Grid item>
                                 <Button color="primary" onClick={handleClickOpen} >Create</Button>
                                 <Button color="secondary" onClick={handleClickOpen} >Modify</Button>
+                                <Button>Delete</Button>
                                 <Button onClick={onAddButtonClicked} disabled={!props.canAddSubscriptions} color="default" >Add..</Button>
                             </Grid>
                         </Grid>

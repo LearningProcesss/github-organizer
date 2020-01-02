@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import GitHubPagination from './GitHubPagination'
 // import { queryGitHub, getPagesFromLink } from '../lib/utils'
-import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon } from '@material-ui/core'
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser';
 
-function GiHubSubscriptions({ subscriptions, pagesCount, subscriptionsHandler }) {
+function GiHubSubscriptions({ showCheckbox, showPagination, subscriptions, pagesCount, handlerPaginationChanged, subscriptionsHandler }) {
 
     // const [pagesCount, setPagesCount] = useState(10)
 
@@ -34,47 +35,67 @@ function GiHubSubscriptions({ subscriptions, pagesCount, subscriptionsHandler })
 
     const onListItemClicked = value => () => {
         console.log('onListItemClicked', value);
-        
+
         const currentIndex = checked.indexOf(value);
         console.log('[0]', currentIndex);
         const newChecked = [...checked];
         console.log('[1]', newChecked);
-        
+
         if (currentIndex === -1) {
             newChecked.push(value);
         } else {
             newChecked.splice(currentIndex, 1);
         }
-        
+
         console.log('[2]', newChecked);
-        
+
         setChecked(newChecked);
-        
+
         subscriptionsHandler(value)
+    }
+
+    const onPaginationChanged = (value) => {
+        handlerPaginationChanged(value)
     }
 
     return (
         <div>
+            {
+                showPagination === 'both' || showPagination === 'top' ?
+                    <Grid container justify="center" alignItems="center">
+                        <GitHubPagination handlerPaginationChanged={onPaginationChanged} pagesCount={pagesCount} />
+                    </Grid>
+                    :
+                    null
+            }
             <List>
                 {
                     subscriptions.map((repo, index) => {
                         return (
                             <React.Fragment>
                                 <ListItem key={repo.id} alignItems="flex-start" button onClick={onListItemClicked(repo.html_url)}>
-                                    <ListItemIcon>
-                                        <Checkbox
-                                            edge="start"
-                                            checked={checked.indexOf(repo.html_url) !== -1}
-                                            tabIndex={-1}
-                                            disableRipple
-                                            inputProps={{ 'aria-labelledby': repo.html_url }}
-                                        />
-                                    </ListItemIcon>
+                                    {
+                                        showCheckbox ?
+                                            <ListItemIcon>
+                                                <Checkbox
+                                                    edge="start"
+                                                    checked={checked.indexOf(repo.html_url) !== -1}
+                                                    tabIndex={-1}
+                                                    disableRipple
+                                                    inputProps={{ 'aria-labelledby': repo.html_url }}
+                                                />
+                                            </ListItemIcon>
+                                            :
+                                            null
+                                    }
                                     <ListItemAvatar>
                                         <Avatar src={repo.avatar_url} />
                                     </ListItemAvatar>
                                     <ListItemText primary={repo.full_name} secondary={repo.description} />
-                                    <ListItemSecondaryAction>
+                                    <ListItemSecondaryAction key="1">
+                                        <IconButton edge="end" aria-label="delete" target="_blank" href={repo.html_url}>
+                                            <DeleteOutlinedIcon />
+                                        </IconButton>
                                         <IconButton edge="end" aria-label="delete" target="_blank" href={repo.html_url}>
                                             <OpenInBrowser />
                                         </IconButton>
@@ -86,7 +107,14 @@ function GiHubSubscriptions({ subscriptions, pagesCount, subscriptionsHandler })
                     })
                 }
             </List>
-            <GitHubPagination pagesCount={pagesCount} />
+            {
+                showPagination === 'both' || showPagination === 'down' ?
+                    <Grid container justify="center" alignItems="center">
+                        <GitHubPagination handlerPaginationChanged={onPaginationChanged} pagesCount={pagesCount} />
+                    </Grid>
+                    :
+                    null
+            }
         </div>
     )
 }

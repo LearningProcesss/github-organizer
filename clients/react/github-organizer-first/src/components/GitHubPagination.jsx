@@ -2,18 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { TextField, MenuItem } from '@material-ui/core';
 
-function GitHubPagination({ pagesCount }) {
+function GitHubPagination({ pagesCount, handlerPaginationChanged }) {
 
     const menuPages = Array.from({
         length: pagesCount
     }, (v, i) => i)
-
-    console.log(menuPages);
-
-
-    const onSelectTextChanged = (e) => {
-        console.log(e);
-
+    
+    const onSelectTextChanged = (e, v) => {
+        handlerPaginationChanged(Number.parseInt(v.key) + 1)
     }
 
     return (
