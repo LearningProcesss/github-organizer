@@ -2,11 +2,9 @@ import React, { Component } from 'react'
 import { Stitch, AnonymousCredential, RemoteMongoClient } from 'mongodb-stitch-browser-sdk';
 import GiHubSubscriptions from './GiHubSubscriptions';
 import { queryGitHub, getPagesFromLink, arrayDestructuring } from '../lib/utils';
-import { Grid, Fab } from '@material-ui/core';
+import { Grid, Fab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField } from '@material-ui/core';
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 import GitHubClassificationBox from './GitHubClassificationBox';
-import SnackOperation from './SnackOperation';
-import GitHubClassificationModal from './GitHubClassificationModal';
 
 export default class GitHubClassificationAdmin extends Component {
 
@@ -24,6 +22,7 @@ export default class GitHubClassificationAdmin extends Component {
         canShowClassificationNewModal: false,
         stichOperationSucess: false,
         stichOperationMessage: '',
+        newClassificationName: ''
     }
 
     async componentDidMount() {
@@ -59,16 +58,21 @@ export default class GitHubClassificationAdmin extends Component {
             })
     }
 
-    queryStitch(query = {}, updateState = true, callback) {
-        this.state.stichMongoDb.collection('classification').find(query).asArray().then(result => {
+    async queryStitch(query = {}, updateState = true, callback) {
+
+        let result
+
+        try {
+            result = await this.state.stichMongoDb.collection('classification').find(query).asArray()
+
             if (updateState) {
                 this.setState({
                     classifications: result
                 })
             }
-        }, error => {
+        } catch (err) {
 
-        })
+        }
     }
 
     async updateStitch(query = {}, update = {}) {
@@ -228,17 +232,36 @@ export default class GitHubClassificationAdmin extends Component {
         }
     }
 
-    createNewClassification(data) {
-        this.state.stichMongoDb.collection('classification').insertOne({
-            name: data,
-            githubTopics: [],
-            githubLinks: [],
-            nodes: []
-        }).then(result => {
+    async createNewClassification(data) {
 
-        }, error => {
-            console.log(error);
-        })
+        let result
+
+        try {
+            result = await this.state.stichMongoDb.collection('classification').insertOne({
+                name: data,
+                githubTopics: [],
+                githubLinks: [],
+                nodes: []
+            })
+
+            if ('insertedId' in result) {
+                await this.queryStitch()
+            }
+        } catch (err) {
+
+        }
+
+        // this.state.stichMongoDb.collection('classification').insertOne({
+        //     name: data,
+        //     githubTopics: [],
+        //     githubLinks: [],
+        //     nodes: []
+        // }).then(result => {
+        //     console.log('createNewClassification', result);
+
+        // }, error => {
+        //     console.log(error);
+        // })
     }
 
     renderSubscriptions() {
@@ -268,12 +291,34 @@ export default class GitHubClassificationAdmin extends Component {
     render() {
         return (
             <div>
-                {
-                    this.state.canShowClassificationNewModal ?
-                        <GitHubClassificationModal canOpen={true} />
-                        :
-                        null
-                }
+                <Dialog open={this.state.canShowClassificationNewModal} onClose={() => this.setState({ canShowClassificationNewModal: false })} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Create new Classification</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Create a brand new classification.
+                                    </DialogContentText>
+                        <TextField
+                            onChange={(e) => this.setState({ newClassificationName: e.target.value })}
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Classificatin name"
+                            type="text"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({ canShowClassificationNewModal: false })} color="secondary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => {
+                            this.createNewClassification(this.state.newClassificationName)
+                            this.setState({ canShowClassificationNewModal: false })
+                        }} color="primary">
+                            Create
+                        </Button>
+                    </DialogActions>
+                </Dialog>
                 <Grid container>
                     <Grid item lg={2} md={4} sm={4} xs={4}>
                         <Grid style={{ marginTop: 10 }} container direction="column" spacing={1}>

@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import Header from './components/Header';
 import GitHubClassificationAdmin from './components/GitHubClassificationAdmin';
 import SnackOperation from './components/SnackOperation';
+import { appReducer, initialState } from './lib/reducer';
+
+const Context = React.createContext()
 
 function App() {
 
-  // const [snackDto, setSnackModel] = React.useState({})
+  const [state, dispacth] = React.useReducer(appReducer, initialState)
 
   const [showModalNewClass, setShowModalNewClass] = React.useState(false)
 
@@ -19,8 +22,6 @@ function App() {
 
   const onShowSnackBar = (eventSnackState) => {
     console.log('onShowSnackBar', eventSnackState);
-
-    // setSnackModel(eventSnackState)
 
     setSnackBarModel({
       show: true,
@@ -35,11 +36,13 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Header handlerCreateNewClassification={onCreateNewClassification} />
-      <SnackOperation open={snack.show} message={snack.message} variant={snack.variant} />
-      <GitHubClassificationAdmin handlerShowSnackBar={onShowSnackBar} classificationPanel={true} />
-    </div>
+    <Context.Provider value={dispacth}>
+      <div className="App">
+        <Header handlerCreateNewClassification={onCreateNewClassification} />
+        <SnackOperation open={snack.show} message={snack.message} variant={snack.variant} />
+        <GitHubClassificationAdmin handlerShowSnackBar={onShowSnackBar} classificationPanel={true} />
+      </div>
+    </Context.Provider>
   );
 }
 

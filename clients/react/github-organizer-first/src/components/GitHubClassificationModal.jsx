@@ -2,16 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField } from '@material-ui/core'
 
-function GitHubClassificationModal({ canOpen }) {
+function GitHubClassificationModal() {
 
-    console.log(canOpen);
-    
+    const [open, setOpen] = React.useState(true);
 
-    const [open, setOpen] = React.useState(false);
+    const [newClassificationName, setNewClassificationName] = React.useState('')
 
-    const handleClose = () => {
-        setOpen(false)
-    }
+    // react components re-render when state or props changes!
+    // the array parameter specify to what changes useEffect should re-run. a emty array indicates taht useEffect and his optionally return function , will runs only mount and unmount phase.
+    // useEffect can return a function, that function is run before useEffect run next time.
+    // React.useEffect(() => {
+    //     console.log('from useEffect!');
+    //     setOpen(true)
+    //     console.log(open);
+    // }, [open])
 
     const onCreateNewButtonClicked = () => {
         
@@ -30,7 +34,7 @@ function GitHubClassificationModal({ canOpen }) {
                         Create a brand new classification.
                     </DialogContentText>
                     <TextField
-                        onChange={onCreateSetClassificationTextChanged}
+                        onChange={(e) => setNewClassificationName(e.target.value)}
                         autoFocus
                         margin="dense"
                         id="name"
@@ -43,7 +47,7 @@ function GitHubClassificationModal({ canOpen }) {
                     <Button onClick={() => setOpen(false)} color="secondary">
                         Cancel
                     </Button>
-                    <Button onClick={onCreateNewButtonClicked} color="primary">
+                    <Button onClick={() => setOpen(false)} color="primary">
                         Create
                     </Button>
                 </DialogActions>

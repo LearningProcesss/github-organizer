@@ -44,6 +44,8 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
 
         classificationDto.githubLinks.push(...subscriptionsToAdd)
 
+        setOpen(false)
+
         handlerAddSubToClassification(classificationDto)
 
         if (stichOperationSucess) {
@@ -58,17 +60,9 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
     return (
         <div>
             <Card elevation={2}>
-                {/* <ButtonBase>
-                    
-                </ButtonBase> */}
                 <CardHeader
                     title=
                     {
-                        // <Typography variant="h6" >
-                        //     {
-                        //         classificationDto.name
-                        //     }
-                        // </Typography>
                         <TextField variant="outlined" size="small" label="Classification Names" defaultValue={classificationDto.name} />
                     }
                     action=
@@ -122,6 +116,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                         showCheckbox={true}
                         showPagination="both"
                         subscriptions={gitHubDto.gitHubSubscriptions}
+                        clickable={true}
                         itemsSelected={subscriptionsToAdd}
                         itemDisabled={classificationDto.githubLinks.map(sub => sub.id)}
                         pagesCount={gitHubDto.gitHubPages} />
