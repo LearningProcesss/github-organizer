@@ -9,10 +9,10 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import { Typography, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, IconButton, Badge, ButtonBase, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
 import GiHubSubscriptions from './GiHubSubscriptions';
 
-function GitHubClassificationBox({ classificationDto, gitHubDto, handlerPaginationChanged, handlerClassificationSelected }) {
+function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationSucess, handlerAddSubToClassification, handlerPaginationChanged, handlerClassificationSelected, handlerDeleteClassification }) {
 
-    console.log(gitHubDto);
-    
+    console.log(classificationDto);
+
     const [open, setOpen] = React.useState(false);
 
     const [subscriptionsToAdd, setSubscriptionsToAdd] = React.useState([])
@@ -42,6 +42,17 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, handlerPaginati
 
     const onDialogSaveButtonClicked = (value) => {
 
+        classificationDto.githubLinks.push(...subscriptionsToAdd)
+
+        handlerAddSubToClassification(classificationDto)
+
+        if (stichOperationSucess) {
+            setSubscriptionsToAdd([])
+        }
+    }
+
+    const onButtonDeleteClicked = () => {
+        handlerDeleteClassification(classificationDto)
     }
 
     return (
@@ -84,26 +95,36 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, handlerPaginati
                 </CardContent>
                 <CardActions>
                     <IconButton onClick={() => handleClickOpen()} >
-                        <AddBoxIcon color="primary" />
+                        <AddBoxIcon fontSize="large" color="primary" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={onButtonDeleteClicked}>
                         <DeleteForeverOutlinedIcon color="secondary" />
                     </IconButton>
-                    <IconButton>
-                        <SaveIcon />
+                    <IconButton onClick={onDialogSaveButtonClicked} disabled={subscriptionsToAdd.length == 0}>
+                        <Badge badgeContent={subscriptionsToAdd.length} color="secondary">
+                            <SaveIcon fontSize="large" />
+                        </Badge>
                     </IconButton>
                 </CardActions>
             </Card>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Create new Classification</DialogTitle>
+                <DialogTitle id="form-dialog-title">Classify these repos as: {classificationDto.name}</DialogTitle>
                 <DialogContent>
-                    <GiHubSubscriptions 
+                    <GiHubSubscriptions
                         handlerGitHubSubSelected={onGitHubItemSelected}
                         handlerPaginationChanged={onPaginationChanged}
+                        itemActions={
+                            {
+                                delete: false,
+                                show: true
+                            }
+                        }
                         showCheckbox={true}
                         showPagination="both"
-                        subscriptions={gitHubDto.gitHubSubscriptions} 
-                        pagesCount={gitHubDto.gitHubPages}/>
+                        subscriptions={gitHubDto.gitHubSubscriptions}
+                        itemsSelected={subscriptionsToAdd}
+                        itemDisabled={classificationDto.githubLinks.map(sub => sub.id)}
+                        pagesCount={gitHubDto.gitHubPages} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">

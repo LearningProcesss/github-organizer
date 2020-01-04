@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { Stitch, AnonymousCredential, RemoteMongoClient } from 'mongodb-stitch-browser-sdk';
-import GitHubCommands from './GitHubCommands';
 import GiHubSubscriptions from './GiHubSubscriptions';
 import { queryGitHub, getPagesFromLink, arrayDestructuring } from '../lib/utils';
-import { Grid } from '@material-ui/core';
+import { Grid, Fab } from '@material-ui/core';
+import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 import GitHubClassificationBox from './GitHubClassificationBox';
+import SnackOperation from './SnackOperation';
+import GitHubClassificationModal from './GitHubClassificationModal';
 
 export default class GitHubClassificationAdmin extends Component {
 
@@ -17,7 +19,11 @@ export default class GitHubClassificationAdmin extends Component {
         classificationSelected: {},
         pages: -1,
         canAddSubscriptions: false,
-        canRenderClassificationSubscriptions: false
+        canRenderClassificationSubscriptions: false,
+        canShowStichSnack: false,
+        canShowClassificationNewModal: false,
+        stichOperationSucess: false,
+        stichOperationMessage: '',
     }
 
     async componentDidMount() {
@@ -73,6 +79,14 @@ export default class GitHubClassificationAdmin extends Component {
         return result
     }
 
+    async deleteStich(query = {}) {
+        const result = await this.state.stichMongoDb
+            .collection('classification')
+            .deleteOne(query)
+
+        return result
+    }
+
     async setupGithub() {
 
         const response = await queryGitHub('subscriptions')
@@ -87,6 +101,12 @@ export default class GitHubClassificationAdmin extends Component {
 
     onCreate = (data) => {
         this.createNewClassification(data)
+    }
+
+    onCreateClassificationButtonClicked = () => {
+        this.setState({
+            canShowClassificationNewModal: true
+        })
     }
 
     onSubscriptionsSelected = (subscriptionLink) => {
@@ -112,13 +132,19 @@ export default class GitHubClassificationAdmin extends Component {
     }
 
     onAddSubscriptions = async () => {
-        const result = await this.updateStitch({
-            _id: { $eq: this.state.classificationSelected._id }
-        }, {
-            $push: {
-                githubLinks: { $each: this.state.subscriptionsSelectedToAdd }
+        const result = await this.updateStitch(
+            {
+                _id: { $eq: this.state.classificationSelected._id }
+            },
+            {
+                $push: {
+                    githubLinks: {
+                        $each: this.state.subscriptionsSelectedToAdd
+                    }
+                }
             }
-        })
+        )
+        //TODO toaster
         console.log('onAddSubscriptions', result);
     }
 
@@ -129,6 +155,77 @@ export default class GitHubClassificationAdmin extends Component {
         this.setState({
             subscriptions: arrayDestructuring(await response.json(), '')
         })
+    }
+
+    onAddSubToClassification = async (classificationDto) => {
+
+        let snackModel = {
+            message: ``,
+            variant: ``
+        }
+
+        try {
+            const result = await this.updateStitch(
+                {
+                    _id: { $eq: classificationDto._id }
+                },
+                {
+                    $addToSet: {
+                        githubLinks: {
+                            $each: classificationDto.githubLinks
+                        }
+                    }
+                }
+            )
+            console.log('onAddSubToClassification', result);
+
+            snackModel.message = `Updated`
+            snackModel.variant = `success`
+        } catch (err) {
+            snackModel.message = `Error`
+            snackModel.variant = `error`
+        }
+
+        this.props.handlerShowSnackBar(snackModel)
+
+        this.setState({
+            stichOperationSucess: true
+        })
+    }
+
+    onDeleteClassification = async (classificationDto) => {
+
+        let snackModel = {
+            message: ``,
+            variant: ``
+        }
+
+        let result
+
+        try {
+            result = await this.deleteStich({ _id: { $eq: classificationDto._id } })
+            console.log(result);
+
+            snackModel.message = `Updated`
+            snackModel.variant = `success`
+        } catch (err) {
+            snackModel.message = `Error`
+            snackModel.variant = `error`
+        }
+
+        this.props.handlerShowSnackBar(snackModel)
+
+        if (result !== null && 'deletedCount' in result) {
+
+            this.setState(state => {
+
+                const subscriptionsSelectedToAdd = state.subscriptionsSelectedToAdd.filter(item => item._id !== classificationDto._id)
+
+                return {
+                    subscriptionsSelectedToAdd
+                }
+            })
+        }
     }
 
     createNewClassification(data) {
@@ -164,33 +261,38 @@ export default class GitHubClassificationAdmin extends Component {
             subscriptionsHandler={this.onSubscriptionsSelected}
             showCheckbox={false}
             pagesCount={this.state.pages}
+            clickable={false}
             subscriptions={this.state.classificationSelected.githubLinks} />
     }
 
     render() {
         return (
             <div>
-                {/* <GitHubCommands
-                    handlerClassificationSelected={this.onClassificationSelected}
-                    handlerAddSubscription={this.onAddSubscriptions}
-                    handlerClassificationCreate={this.onCreate}
-                    classificationPanel={this.props.classificationPanel}
-                    classifications={this.state.classifications}
-                    canAddSubscriptions={this.state.canAddSubscriptions} /> */}
+                {
+                    this.state.canShowClassificationNewModal ?
+                        <GitHubClassificationModal canOpen={true} />
+                        :
+                        null
+                }
                 <Grid container>
                     <Grid item lg={2} md={4} sm={4} xs={4}>
-
-                        {/* // this.renderSubscriptions() */}
                         <Grid style={{ marginTop: 10 }} container direction="column" spacing={1}>
+                            <Fab onClick={this.onCreateClassificationButtonClicked} variant="extended">
+                                <LibraryAddIcon />
+                                Create
+                            </Fab>
                             {
                                 this.state.classifications.map(classification => {
                                     return (
                                         <Grid item key={classification._id}>
                                             <GitHubClassificationBox
+                                                handlerDeleteClassification={this.onDeleteClassification}
+                                                handlerAddSubToClassification={this.onAddSubToClassification}
                                                 handlerPaginationChanged={this.onPaginationChanged}
                                                 handlerClassificationSelected={this.onClassificationSelected}
                                                 handlerGetGithubSubscrition={this.onGetGithubSubscrition}
                                                 classificationDto={classification}
+                                                stichOperationSucess={this.state.stichOperationSucess}
                                                 gitHubDto={
                                                     {
                                                         gitHubSubscriptions: this.state.subscriptions,
@@ -202,7 +304,6 @@ export default class GitHubClassificationAdmin extends Component {
                                 })
                             }
                         </Grid>
-
                     </Grid>
                     <Grid style={{ marginTop: 7 }} item lg={6} md={6} sm={6} xs={6}>
                         {
