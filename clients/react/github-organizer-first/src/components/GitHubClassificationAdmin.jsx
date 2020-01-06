@@ -225,8 +225,56 @@ export default class GitHubClassificationAdmin extends Component {
 
                 const subscriptionsSelectedToAdd = state.subscriptionsSelectedToAdd.filter(item => item._id !== classificationDto._id)
 
+                const classifications = state.classifications.filter(item => item._id !== classificationDto._id)
+
                 return {
-                    subscriptionsSelectedToAdd
+                    subscriptionsSelectedToAdd,
+                    classifications
+                }
+            })
+        }
+    }
+
+    onHandlerDeleteSubFromClassificationClicked = async (idGitHub) => {
+        console.log('onHandlereleteSubFromClassificationClicked', idGitHub, this.state.classificationSelected._id);
+
+        let result
+
+        try {
+            result = await this.updateStitch({ _id: { $eq: this.state.classificationSelected._id } },
+                {
+                    $pull: {
+                        githubLinks: {
+                            id: idGitHub
+                        }
+                    }
+                })
+
+            console.log(result);
+
+        } catch (err) {
+
+        }
+
+        if (result !== null && 'modifiedCount' in result && result.modifiedCount > 0) {
+
+            this.setState(state => {
+
+                const classifications = [...state.classifications]
+
+                const links = classifications.filter(item => item._id === state.classificationSelected._id)[0].githubLinks.filter(item => item.id !== idGitHub)
+                
+                classifications.filter(item => item._id === state.classificationSelected._id)[0].githubLinks = links
+                
+                const classificationSelected = { ...state.classificationSelected }
+
+                const subscriptions = classificationSelected.githubLinks.filter(item => item.id !== idGitHub)
+
+                classificationSelected.githubLinks = [...subscriptions]
+
+                return {
+                    classifications,
+                    classificationSelected
                 }
             })
         }
@@ -250,18 +298,6 @@ export default class GitHubClassificationAdmin extends Component {
         } catch (err) {
 
         }
-
-        // this.state.stichMongoDb.collection('classification').insertOne({
-        //     name: data,
-        //     githubTopics: [],
-        //     githubLinks: [],
-        //     nodes: []
-        // }).then(result => {
-        //     console.log('createNewClassification', result);
-
-        // }, error => {
-        //     console.log(error);
-        // })
     }
 
     renderSubscriptions() {
@@ -280,6 +316,7 @@ export default class GitHubClassificationAdmin extends Component {
         if (!this.state.canRenderClassificationSubscriptions) { return null }
 
         return <GiHubSubscriptions
+            handlerDeleteSubFromClassificationClicked={this.onHandlerDeleteSubFromClassificationClicked}
             handlerPaginationChanged={this.onPaginationChanged}
             subscriptionsHandler={this.onSubscriptionsSelected}
             showCheckbox={false}

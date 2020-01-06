@@ -95,7 +95,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                         <DeleteForeverOutlinedIcon color="secondary" />
                     </IconButton>
                     <IconButton onClick={onDialogSaveButtonClicked} disabled={subscriptionsToAdd.length == 0}>
-                        <Badge badgeContent={subscriptionsToAdd.length} color="secondary">
+                        <Badge badgeContent={stichOperationSucess ? 0 : subscriptionsToAdd.length} color="secondary">
                             <SaveIcon fontSize="large" />
                         </Badge>
                     </IconButton>

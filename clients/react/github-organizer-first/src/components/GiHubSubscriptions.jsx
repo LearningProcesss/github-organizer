@@ -6,7 +6,17 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser';
 
-function GiHubSubscriptions({ clickable, itemActions, itemDisabled, itemsSelected, showCheckbox, showPagination, subscriptions, pagesCount, handlerPaginationChanged, handlerGitHubSubSelected }) {
+function GiHubSubscriptions({ clickable, 
+    itemActions, 
+    itemDisabled,
+    itemsSelected,
+    showCheckbox,
+    showPagination,
+    subscriptions,
+    pagesCount,
+    handlerPaginationChanged,
+    handlerGitHubSubSelected,
+    handlerDeleteSubFromClassificationClicked }) {
 
     // const [pagesCount, setPagesCount] = useState(10)
 
@@ -56,6 +66,12 @@ function GiHubSubscriptions({ clickable, itemActions, itemDisabled, itemsSelecte
         handlerPaginationChanged(value)
     }
 
+    const onDeleteSubFromClassificationClicked = (idGitHub) => {
+        console.log('onDeleteSubFromClassificationClicked', idGitHub);
+        
+        handlerDeleteSubFromClassificationClicked(idGitHub)
+    }
+
     const canShowPagination = () => {
         if (showPagination === 'both' || showPagination === 'top') {
             return <GitHubPagination handlerPaginationChanged={onPaginationChanged} pagesCount={pagesCount} />
@@ -72,10 +88,10 @@ function GiHubSubscriptions({ clickable, itemActions, itemDisabled, itemsSelecte
         }
     }
 
-    const canShowDeleteButton = () => {
+    const canShowDeleteButton = (id) => {
         if (itemActions.delete) {
             return (
-                <IconButton edge="end" aria-label="delete" target="_blank">
+                <IconButton edge="end" aria-label="delete" target="_blank" onClick={onDeleteSubFromClassificationClicked.bind(null, id)}>
                     <DeleteOutlinedIcon />
                 </IconButton>
             )
@@ -132,7 +148,7 @@ function GiHubSubscriptions({ clickable, itemActions, itemDisabled, itemsSelecte
                                             canShowDisplayButton(repo.html_url)
                                         }
                                         {
-                                            canShowDeleteButton()
+                                            canShowDeleteButton(repo.id)
                                         }
                                     </ListItemSecondaryAction>
                                 </ListItem>
