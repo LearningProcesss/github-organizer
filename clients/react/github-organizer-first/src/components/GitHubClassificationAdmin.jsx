@@ -13,6 +13,7 @@ export default class GitHubClassificationAdmin extends Component {
         stichMongoDb: {},
         classifications: [],
         subscriptions: [],
+        subscriptionsRenderedFilter: '',
         subscriptionsSelectedToAdd: [],
         classificationSelected: {},
         pages: -1,
@@ -263,9 +264,9 @@ export default class GitHubClassificationAdmin extends Component {
                 const classifications = [...state.classifications]
 
                 const links = classifications.filter(item => item._id === state.classificationSelected._id)[0].githubLinks.filter(item => item.id !== idGitHub)
-                
+
                 classifications.filter(item => item._id === state.classificationSelected._id)[0].githubLinks = links
-                
+
                 const classificationSelected = { ...state.classificationSelected }
 
                 const subscriptions = classificationSelected.githubLinks.filter(item => item.id !== idGitHub)
@@ -278,6 +279,12 @@ export default class GitHubClassificationAdmin extends Component {
                 }
             })
         }
+    }
+
+    onSearchSubscriptions = (text) => {
+        this.setState({
+            subscriptionsRenderedFilter: text
+        })
     }
 
     async createNewClassification(data) {
@@ -322,7 +329,14 @@ export default class GitHubClassificationAdmin extends Component {
             showCheckbox={false}
             pagesCount={this.state.pages}
             clickable={false}
-            subscriptions={this.state.classificationSelected.githubLinks} />
+            subscriptions={this.state.subscriptionsRenderedFilter != '' ?
+                this.state.classificationSelected.githubLinks.filter(item =>
+                    item.name.includes(this.state.subscriptionsRenderedFilter)
+                    ||
+                    item.full_name.includes(this.state.subscriptionsRenderedFilter)
+                    ||
+                    item.description.includes(this.state.subscriptionsRenderedFilter)
+                ) : this.state.classificationSelected.githubLinks} />
     }
 
     render() {
@@ -368,6 +382,7 @@ export default class GitHubClassificationAdmin extends Component {
                                     return (
                                         <Grid item key={classification._id}>
                                             <GitHubClassificationBox
+                                                handlerSearchSubscriptions={this.onSearchSubscriptions}
                                                 handlerDeleteClassification={this.onDeleteClassification}
                                                 handlerAddSubToClassification={this.onAddSubToClassification}
                                                 handlerPaginationChanged={this.onPaginationChanged}

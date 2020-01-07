@@ -9,7 +9,7 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import { Typography, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, IconButton, Badge, ButtonBase, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
 import GiHubSubscriptions from './GiHubSubscriptions';
 
-function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationSucess, handlerAddSubToClassification, handlerPaginationChanged, handlerClassificationSelected, handlerDeleteClassification }) {
+function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationSucess, handlerSearchSubscriptions, handlerAddSubToClassification, handlerPaginationChanged, handlerClassificationSelected, handlerDeleteClassification }) {
 
     console.log(classificationDto);
 
@@ -57,6 +57,10 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
         handlerDeleteClassification(classificationDto)
     }
 
+    const onSearchTextChanged = (value) => {
+        handlerSearchSubscriptions(value)
+    }
+
     return (
         <div>
             <Card elevation={2}>
@@ -78,6 +82,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                     <TextField
                         id="input-with-icon-textfield"
                         label="Search"
+                        onChange={(e) => onSearchTextChanged(e.target.value)}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
