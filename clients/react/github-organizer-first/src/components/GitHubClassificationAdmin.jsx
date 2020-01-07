@@ -287,6 +287,11 @@ export default class GitHubClassificationAdmin extends Component {
         })
     }
 
+    startCreateNeClassification() {
+        this.createNewClassification(this.state.newClassificationName)
+        this.setState({ canShowClassificationNewModal: false })
+    }
+
     async createNewClassification(data) {
 
         let result
@@ -345,11 +350,9 @@ export default class GitHubClassificationAdmin extends Component {
                 <Dialog open={this.state.canShowClassificationNewModal} onClose={() => this.setState({ canShowClassificationNewModal: false })} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Create new Classification</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>
-                            Create a brand new classification.
-                                    </DialogContentText>
                         <TextField
                             onChange={(e) => this.setState({ newClassificationName: e.target.value })}
+                            onKeyPress={(e) => e.charCode === 13 ? this.startCreateNeClassification() : null }
                             autoFocus
                             margin="dense"
                             id="name"
@@ -362,10 +365,7 @@ export default class GitHubClassificationAdmin extends Component {
                         <Button onClick={() => this.setState({ canShowClassificationNewModal: false })} color="secondary">
                             Cancel
                         </Button>
-                        <Button onClick={() => {
-                            this.createNewClassification(this.state.newClassificationName)
-                            this.setState({ canShowClassificationNewModal: false })
-                        }} color="primary">
+                        <Button onClick={this.startCreateNeClassification} color="primary">
                             Create
                         </Button>
                     </DialogActions>
