@@ -9,9 +9,12 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import { Typography, Card, CardHeader, CardContent, TextField, InputAdornment, CardActions, IconButton, Badge, ButtonBase, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
 import GiHubSubscriptions from './GiHubSubscriptions';
 
-function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationSucess, handlerSearchSubscriptions, handlerAddSubToClassification, handlerPaginationChanged, handlerClassificationSelected, handlerDeleteClassification }) {
-
-    console.log(classificationDto);
+function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationSucess,
+    handlerSearchSubscriptions,
+    handlerAddSubToClassification,
+    handlerPaginationChanged,
+    handlerClassificationSelected,
+    handlerDeleteClassification }) {
 
     const [open, setOpen] = React.useState(false);
 
@@ -46,11 +49,9 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
 
         setOpen(false)
 
-        handlerAddSubToClassification(classificationDto)
+        setSubscriptionsToAdd([])
 
-        if (stichOperationSucess) {
-            setSubscriptionsToAdd([])
-        }
+        handlerAddSubToClassification(classificationDto)
     }
 
     const onButtonDeleteClicked = () => {
@@ -106,7 +107,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                     </IconButton>
                 </CardActions>
             </Card>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <Dialog onKeyPress={(e) => e.charCode === 13 ? onDialogSaveButtonClicked() : null} open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Classify these repos as: {classificationDto.name}</DialogTitle>
                 <DialogContent>
                     <GiHubSubscriptions
