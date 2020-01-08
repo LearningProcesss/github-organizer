@@ -334,6 +334,7 @@ export default class GitHubClassificationAdmin extends Component {
             showCheckbox={false}
             pagesCount={this.state.pages}
             clickable={false}
+            classificationName={this.state.classificationSelected.name}
             subscriptions={this.state.subscriptionsRenderedFilter != '' ?
                 this.state.classificationSelected.githubLinks.filter(item =>
                     item.name.includes(this.state.subscriptionsRenderedFilter)

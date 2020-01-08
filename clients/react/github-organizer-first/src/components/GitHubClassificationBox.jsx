@@ -20,6 +20,8 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
 
     const [subscriptionsToAdd, setSubscriptionsToAdd] = React.useState([])
 
+    const [cardElevation, setCardElevation] = React.useState(1)
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -64,7 +66,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
 
     return (
         <div>
-            <Card elevation={2}>
+            <Card elevation={cardElevation} onMouseOver={() => setCardElevation(5)} onMouseLeave={() => setCardElevation(1)}>
                 <CardHeader
                     title=
                     {
@@ -72,7 +74,11 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                     }
                     action=
                     {
-                        <IconButton onClick={() => handlerClassificationSelected(classificationDto)} aria-label={`${classificationDto.githubLinks.length} GitHub repos classified`}>
+                        <IconButton onClick={() => {
+                            handlerClassificationSelected(classificationDto)
+                            setCardElevation(5)
+                        }
+                        } aria-label={`${classificationDto.githubLinks.length} GitHub repos classified`}>
                             <Badge badgeContent={classificationDto.githubLinks.length} showZero color={badgeColorByCount()}>
                                 <GitHubIcon />
                             </Badge>

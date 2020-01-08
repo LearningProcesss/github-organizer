@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { palette, borders } from '@material-ui/system';
 import GitHubPagination from './GitHubPagination'
 // import { queryGitHub, getPagesFromLink } from '../lib/utils'
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
-import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid } from '@material-ui/core'
+import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid, Box, Button, Typography } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser';
 
-function GiHubSubscriptions({ clickable, 
-    itemActions, 
+function GiHubSubscriptions({ 
+    clickable,
+    itemActions,
     itemDisabled,
     itemsSelected,
     showCheckbox,
     showPagination,
     subscriptions,
     pagesCount,
+    classificationName,
     handlerPaginationChanged,
     handlerGitHubSubSelected,
     handlerDeleteSubFromClassificationClicked }) {
@@ -68,7 +71,7 @@ function GiHubSubscriptions({ clickable,
 
     const onDeleteSubFromClassificationClicked = (idGitHub) => {
         console.log('onDeleteSubFromClassificationClicked', idGitHub);
-        
+
         handlerDeleteSubFromClassificationClicked(idGitHub)
     }
 
@@ -98,11 +101,16 @@ function GiHubSubscriptions({ clickable,
         }
     }
 
-
-
     return (
         <div>
-
+            <Box textAlign="center" borderRadius="borderRadius" boxShadow={3} bgcolor="success.main" color="success.contrastText" p={2}>
+                <Typography variant="caption" align="center">
+{ 
+    classificationName 
+}
+                </Typography>
+                
+            </Box>
             <Grid container justify="center" alignItems="center">
                 {
                     canShowPagination()
