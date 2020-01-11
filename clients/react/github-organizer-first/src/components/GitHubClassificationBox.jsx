@@ -125,6 +125,7 @@ function GitHubClassificationBox({ classificationDto, gitHubDto, stichOperationS
                                 show: true
                             }
                         }
+                        showTopBox={false}
                         showCheckbox={true}
                         showPagination="both"
                         subscriptions={gitHubDto.gitHubSubscriptions}
