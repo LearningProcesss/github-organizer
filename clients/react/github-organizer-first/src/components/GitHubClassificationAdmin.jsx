@@ -331,6 +331,7 @@ export default class GitHubClassificationAdmin extends Component {
             handlerDeleteSubFromClassificationClicked={this.onHandlerDeleteSubFromClassificationClicked}
             handlerPaginationChanged={this.onPaginationChanged}
             subscriptionsHandler={this.onSubscriptionsSelected}
+            showTopBox={true}
             showCheckbox={false}
             pagesCount={this.state.pages}
             clickable={false}
@@ -371,10 +372,10 @@ export default class GitHubClassificationAdmin extends Component {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <Grid container>
-                    <Grid item lg={2} md={4} sm={4} xs={4}>
-                        <Grid style={{ marginTop: 10 }} container direction="column" spacing={1}>
-                            <Fab onClick={this.onCreateClassificationButtonClicked} variant="extended">
+                <Grid container justify="space-between">
+                    <Grid style={{ marginTop: 15, marginLeft: 20 }} item lg={2} md={4} sm={4} xs={4}>
+                        <Grid container direction="column" spacing={1}>
+                            <Fab style={{ marginBottom: 10 }} onClick={this.onCreateClassificationButtonClicked} variant="extended">
                                 <LibraryAddIcon />
                                 Create
                             </Fab>
@@ -403,7 +404,7 @@ export default class GitHubClassificationAdmin extends Component {
                             }
                         </Grid>
                     </Grid>
-                    <Grid style={{ marginTop: 7 }} item lg={6} md={6} sm={6} xs={6}>
+                    <Grid style={{ marginTop: 12, marginRight: 20 }} item lg={6} md={6} sm={6} xs={6}>
                         {
                             this.renderClassificationSubscriptions()
                         }

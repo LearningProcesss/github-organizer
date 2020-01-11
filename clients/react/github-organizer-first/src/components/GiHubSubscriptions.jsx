@@ -7,11 +7,12 @@ import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, IconButton, ListItemSecondaryAction, Divider, Checkbox, ListItemIcon, Grid, Box, Button, Typography } from '@material-ui/core'
 import OpenInBrowser from '@material-ui/icons/OpenInBrowser';
 
-function GiHubSubscriptions({ 
+function GiHubSubscriptions({
     clickable,
     itemActions,
     itemDisabled,
     itemsSelected,
+    showTopBox,
     showCheckbox,
     showPagination,
     subscriptions,
@@ -101,16 +102,27 @@ function GiHubSubscriptions({
         }
     }
 
+    const canShowTopPanel = () => {
+        if (showTopBox) {
+            return (
+                <Box textAlign="center" borderRadius="borderRadius" boxShadow={3} bgcolor="success.main" color="success.contrastText" p={2}>
+                    <Typography variant="caption" align="center">
+                        {
+                            classificationName
+                        }
+                    </Typography>
+
+                </Box>
+            )
+        }
+    }
+
     return (
         <div>
-            <Box textAlign="center" borderRadius="borderRadius" boxShadow={3} bgcolor="success.main" color="success.contrastText" p={2}>
-                <Typography variant="caption" align="center">
-{ 
-    classificationName 
-}
-                </Typography>
-                
-            </Box>
+            {
+                canShowTopPanel()
+            }
+
             <Grid container justify="center" alignItems="center">
                 {
                     canShowPagination()
